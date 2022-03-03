@@ -55,7 +55,7 @@ class LuaFormatter
   private:
     sol::state m_lua;
     fmt::memory_buffer m_buffer;
-    std::stack<std::optional<int64_t>> m_previous_index;
+    std::stack<std::optional<double>> m_previous_index;
 
   public:
     bool load(std::string path)
@@ -149,10 +149,8 @@ class LuaFormatter
         return true;
     }
 
-    bool write_key(double raw_index)
+    bool write_key(double index)
     {
-        int64_t index = static_cast<int64_t>(raw_index);
-
         if (update_index(index)) {
             return false;
         }
@@ -211,7 +209,7 @@ class LuaFormatter
             write(",");
 
         if (is_indexed()) {
-            write("  -- [");
+            write(" -- [");
             write(static_cast<int64_t>(key.as<double>()));
             write("]");
         }
@@ -229,7 +227,7 @@ class LuaFormatter
         }
     }
 
-    bool update_index(int64_t index)
+    bool update_index(double index)
     {
         if (m_previous_index.top() == index - 1) {
             m_previous_index.pop();
@@ -244,7 +242,7 @@ class LuaFormatter
     static std::string render_table_key(const sol::object & key)
     {
         if (key.is<double>())
-            return fmt::format("{:020d}", static_cast<int64_t>(key.as<double>()));
+            return fmt::format("{:020f}", key.as<double>());
         else
             return key.as<std::string>();
     }
@@ -271,9 +269,9 @@ class LuaFormatter
         std::sort(entries.begin(), entries.end(), [](const auto & lhs, const auto & rhs) {
             // lua starts its indexes at 1, so ensure 0 is sorted last
             {
-                if (lhs.rendered == "00000000000000000000")
+                if (lhs.rendered == "00000000000000000000.0")
                     return false;
-                if (rhs.rendered == "00000000000000000000")
+                if (rhs.rendered == "00000000000000000000.0")
                     return true;
             }
             return lhs.rendered < rhs.rendered;
