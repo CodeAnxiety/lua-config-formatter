@@ -18,16 +18,18 @@
 #include <unordered_set>
 #include <variant>
 
+static bool QUIET = false;
 static bool VERBOSE = false;
 static bool DRY_RUN = false;
 static bool SHOW_OUTPUT = false;
 static std::filesystem::path INPUT_PATH;
 static std::filesystem::path OUTPUT_PATH;
 
-#define LOG_INFO(format, ...)                 \
-    do {                                      \
-        fmt::print(format "\n", __VA_ARGS__); \
-    }                                         \
+#define LOG_INFO(format, ...)                     \
+    do {                                          \
+        if (!QUIET)                               \
+            fmt::print(format "\n", __VA_ARGS__); \
+    }                                             \
     while (0)
 
 #define LOG_ERROR(format, ...)                                                            \
@@ -38,9 +40,8 @@ static std::filesystem::path OUTPUT_PATH;
 
 #define LOG_DEBUG(format, ...)                                               \
     do {                                                                     \
-        if (VERBOSE) {                                                       \
+        if (!QUIET && VERBOSE)                                               \
             fmt::print(fmt::fg(fmt::color::gray), format "\n", __VA_ARGS__); \
-        }                                                                    \
     }                                                                        \
     while (0)
 
@@ -396,6 +397,7 @@ int main(int argc, const char ** argv)
     bool usage_shown = false;
     std::string input_path_raw, output_path_raw;
     auto cli = lyra::cli() | lyra::help(usage_shown) | lyra::opt(VERBOSE)["-v", "--verbose"]("Print verbose messages.")
+             | lyra::opt(QUIET)["-q", "--quiet"]("Suppress messages.")
              | lyra::opt(DRY_RUN)["--dry-run"]("Do not save the formatted files.")
              | lyra::opt(SHOW_OUTPUT)["--show"]("Output formatting result.")
              | lyra::arg(input_path_raw, "input_path")("Path to be formatted.")
