@@ -1,0 +1,6 @@
+[
+{
+  "directory": "D:\\projects\\wow-savedvar-sorter",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.31.31103\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/std:c++20", "/IC:\\Users\\codea\\AppData\\Local\\.xmake\\packages\\s\\sol2\\v3.2.3\\ec2500b4f7244c37aed12be34b9162e1\\include", "/IC:\\Users\\codea\\AppData\\Local\\.xmake\\packages\\l\\lua\\v5.4.4\\200aae53e3a8489bb9f8fd764de1b658\\include\\lua", "/IC:\\Users\\codea\\AppData\\Local\\.xmake\\packages\\f\\fmt\\8.1.1\\3c4518782925487388553bdb3459c51d\\include", "/IC:\\Users\\codea\\AppData\\Local\\.xmake\\packages\\l\\lyra\\1.6\\1ab16be4a39c4796a4eb408e2bfd2b35\\include", "/Fobuild\\.objs\\wow-savedvar-sorter\\windows\\x64\\debug\\src\\main.cpp.obj", "src\\main.cpp"],
+  "file": "src\\main.cpp"
+}]

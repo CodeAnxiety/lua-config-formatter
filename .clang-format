@@ -1,0 +1,75 @@
+---
+BasedOnStyle: LLVM
+ColumnLimit: 120
+UseCRLF: false
+UseTab: Never
+TabWidth: 4
+IndentWidth: 4
+
+---
+Language: Cpp
+Standard: Latest
+
+SortUsingDeclarations: false
+SortIncludes: false
+IncludeBlocks: Preserve
+IncludeCategories:
+    - Regex: '^<[^\.]+>$' # Standard headers.
+      Priority: 2
+    - Regex: "^<" # External headers.
+      Priority: 3
+    - Regex: '^"' # Local headers.
+      Priority: 1
+
+# Don't format NOLINT comments, as this can break them.
+CommentPragmas: "NOLINT"
+
+# Everyone's got one...
+BreakBeforeBraces: Custom
+BraceWrapping:
+    AfterCaseLabel: false
+    AfterClass: true
+    AfterControlStatement: Never
+    AfterEnum: true
+    AfterExternBlock: true
+    AfterFunction: true
+    AfterNamespace: true
+    AfterStruct: true
+    AfterUnion: true
+    BeforeCatch: true
+    BeforeElse: true
+    BeforeWhile: true
+    IndentBraces: false
+    SplitEmptyFunction: true
+    SplitEmptyNamespace: true
+    SplitEmptyRecord: true
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: true
+AlignOperands: AlignAfterOperator
+AlignTrailingComments: true
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: true
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: BeforeColon
+BreakInheritanceList: BeforeColon
+FixNamespaceComments: false
+IndentCaseLabels: true
+IndentExternBlock: true
+IndentPPDirectives: AfterHash
+KeepEmptyLinesAtTheStartOfBlocks: false
+NamespaceIndentation: All
+PointerAlignment: Middle
+SpaceAfterLogicalNot: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpacesBeforeTrailingComments: 2

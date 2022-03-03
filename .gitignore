@@ -1,0 +1,15 @@
+# Xmake cache
+/.xmake
+
+# Build
+/build
+/out
+
+# Projects
+/vs*
+/vsxmake*
+
+# MacOS Cache
+.DS_Store
+
+
