@@ -9,10 +9,19 @@ namespace
 {
     bool is_identifier(std::string_view text)
     {
+        if (text.empty())
+            return false;
+
+        // leading character must be a letter or underscore
+        if (!std::isalpha(text[0]) && text[0] != '_')
+            return false;
+        text.remove_prefix(1);
+
         for (char character : text) {
             if (!std::isalnum(character) && character != '_')
                 return false;
         }
+
         return true;
     }
 
@@ -29,6 +38,7 @@ namespace
             default:
                 fatal("Encountered unsupported key type: {}",
                       sol::type_name(lua, key.get_type()));
+                return {};
         }
     };
 
@@ -223,8 +233,8 @@ void formatter::write_table(const sol::table & table, int depth)
     assert(m_previous_index.size() == starting_size);
 }
 
-void formatter::write_table_entry(const sol::object & key, const sol::object & value,
-                            int depth)
+void formatter::write_table_entry(const sol::object & key,
+                                  const sol::object & value, int depth)
 {
     write_indent(depth);
 
