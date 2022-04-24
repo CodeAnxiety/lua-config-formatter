@@ -3,10 +3,23 @@
 
 #include <sol/sol.hpp>
 
+#include <unordered_set>
+
 using namespace app;
 
 namespace
 {
+    const std::unordered_set<std::string_view> s_keywords = {
+        "and", "break",    "do",     "else", "elseif", "end",   "false",
+        "for", "function", "if",     "in",   "local",  "nil",   "not",
+        "or",  "repeat",   "return", "then", "true",   "until", "while",
+    };
+
+    bool is_keyword(std::string_view text)
+    {
+        return s_keywords.find(text) != s_keywords.end();
+    }
+
     bool is_identifier(std::string_view text)
     {
         if (text.empty())
@@ -15,8 +28,11 @@ namespace
         // leading character must be a letter or underscore
         if (!std::isalpha(text[0]) && text[0] != '_')
             return false;
-        text.remove_prefix(1);
 
+        if (is_keyword(text))
+            return false;
+
+        text.remove_prefix(1);
         for (char character : text) {
             if (!std::isalnum(character) && character != '_')
                 return false;
