@@ -30,31 +30,31 @@ namespace app
     bool should_print(log_level level);
     void print(log_level level, std::string_view message, int depth = 0);
 
-#define IMPLEMENT_LOG_LEVEL(level)                                             \
-    template <typename... Args>                                                \
-    inline void level(int depth, std::string_view message, Args &&... args)    \
-    {                                                                          \
-        if (!should_print(log_level::level))                                   \
-            return;                                                            \
-        print(log_level::level,                                                \
-              fmt::format(fmt::runtime(message), std::forward<Args>(args)...), \
-              depth);                                                          \
-    }                                                                          \
-                                                                               \
-    template <typename... Args>                                                \
-    inline void level(std::string_view message, Args &&... args)               \
-    {                                                                          \
-        level(0, message, std::forward<Args>(args)...);                        \
-    }                                                                          \
-                                                                               \
-    inline void level(std::string_view message)                                \
-    {                                                                          \
-        print(log_level::level, message);                                      \
-    }                                                                          \
-                                                                               \
-    inline void level(int depth, std::string_view message)                     \
-    {                                                                          \
-        print(log_level::level, message, depth);                               \
+#define IMPLEMENT_LOG_LEVEL(level)                                          \
+    template <typename... Args>                                             \
+    inline void level(int depth, fmt::format_string<Args...> message,       \
+                      Args &&... args)                                      \
+    {                                                                       \
+        if (!should_print(log_level::level))                                \
+            return;                                                         \
+        print(log_level::level,                                             \
+              fmt::format(message, std::forward<Args>(args)...), depth);    \
+    }                                                                       \
+                                                                            \
+    template <typename... Args>                                             \
+    inline void level(fmt::format_string<Args...> message, Args &&... args) \
+    {                                                                       \
+        level(0, message, std::forward<Args>(args)...);                     \
+    }                                                                       \
+                                                                            \
+    inline void level(std::string_view message)                             \
+    {                                                                       \
+        print(log_level::level, message);                                   \
+    }                                                                       \
+                                                                            \
+    inline void level(int depth, std::string_view message)                  \
+    {                                                                       \
+        print(log_level::level, message, depth);                            \
     }
 
     IMPLEMENT_LOG_LEVEL(debug);
