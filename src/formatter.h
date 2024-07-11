@@ -42,7 +42,7 @@ namespace app
         }
 
         void write_indent(int depth);
-        void write_escaped(std::string_view text);
+        void write_quoted(std::string_view text);
 
         bool write_key(const sol::object & key);
         bool write_key(std::string_view text);

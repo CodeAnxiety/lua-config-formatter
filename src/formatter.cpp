@@ -2,6 +2,7 @@
 #include "logging.h"
 
 #include <sol/sol.hpp>
+#include <utf8cpp/utf8.h>
 
 #include <unordered_set>
 
@@ -197,19 +198,30 @@ void formatter::write_indent(int depth)
         write("  ");
 }
 
-void formatter::write_escaped(std::string_view text)
+void formatter::write_quoted(std::string_view text)
 {
     write("\"");
-    for (char character : text) {
-        switch (character) {
-            case '\r': break;
-            case '"': write("\\\""); break;
-            case '\\': write("\\\\"); break;
-            case '\t': write("\\t"); break;
-            case '\n': write("\\n"); break;
-            default: write(character); break;
+
+    for (auto it = text.begin(), term = text.end(); it != term;) {
+        try {
+            auto start = it;
+            switch (utf8::next(it, term)) {
+                case '\t': write("\\t"); break;
+                case '\n': write("\\n"); break;
+                case '\"': write("\\\""); break;
+                case '\\': write("\\\\"); break;
+                case '\v': break;
+                case '\f': break;
+                case '\r': break;
+                default: m_buffer.append(&*start, &*it); break;
+            }
+        }
+        catch (...) {
+            m_buffer.append(
+                fmt::format("\\x{:02x}", static_cast<uint8_t>(*it++)));
         }
     }
+
     write("\"");
 }
 
@@ -232,7 +244,7 @@ bool formatter::write_key(std::string_view text)
         write(text);
     else {
         write("[");
-        write_escaped(text);
+        write_quoted(text);
         write("]");
     }
 
@@ -300,7 +312,7 @@ void formatter::write_table_entry(const sol::object & key,
         case sol::type::nil: write("nil"); break;
         case sol::type::none: write("none"); break;
         case sol::type::boolean: write(value.as<bool>()); break;
-        case sol::type::string: write_escaped(value.as<std::string>()); break;
+        case sol::type::string: write_quoted(value.as<std::string>()); break;
         case sol::type::number: write(value.as<double>()); break;
         case sol::type::table:
             write_table(value.as<sol::table>(), depth + 1);
