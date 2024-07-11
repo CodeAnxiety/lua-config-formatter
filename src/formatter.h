@@ -45,8 +45,9 @@ namespace app
         void write_escaped(std::string_view text);
 
         bool write_key(const sol::object & key);
-        bool write_key(double index);
         bool write_key(std::string_view text);
+        bool write_key(double index);
+        bool write_key(bool index);
 
         void write_table(const sol::table & table, int depth);
         void write_table_entry(const sol::object & key,

@@ -50,6 +50,7 @@ namespace
                                    sortable ? 20 : 0);
 
             case sol::type::string: return key.as<std::string>();
+            case sol::type::boolean: return fmt::format("{}", key.as<bool>());
 
             default:
                 fatal("Encountered unsupported key type: {}",
@@ -215,10 +216,11 @@ void formatter::write_escaped(std::string_view text)
 bool formatter::write_key(const sol::object & key)
 {
     switch (key.get_type()) {
-        case sol::type::number: return write_key(key.as<double>());
         case sol::type::string: return write_key(key.as<std::string>());
+        case sol::type::number: return write_key(key.as<double>());
+        case sol::type::boolean: return write_key(key.as<bool>());
         default:
-            fatal("Encountered unsupported key type: {}",
+            fatal("Encountered unsupported key type!: {}",
                   sol::type_name(m_lua, key.get_type()));
             return false;
     }
@@ -247,6 +249,15 @@ bool formatter::write_key(double index)
     write("[");
     write(index);
     write("]");
+    return true;
+}
+
+bool formatter::write_key(bool index)
+{
+    write("[");
+    write(index);
+    write("]");
+    invalidate_index();
     return true;
 }
 
