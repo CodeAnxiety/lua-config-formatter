@@ -3,7 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/src/**"
+                "${workspaceFolder}/src/**",
+                "${env:VCPKG_ROOT}/installed/x64-windows-static/include"
             ],
             "defines": [
                 "_DEBUG",
