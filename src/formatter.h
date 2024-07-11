@@ -32,14 +32,15 @@ namespace app
         [[nodiscard]] std::string render();
 
       private:
+        void write(std::string_view value);
+        void write(double value);
+
         template <typename T>
         void write(T && value)
         {
-            fmt::format_to(m_buffer, "{}", value);
+            fmt::format_to(fmt::appender(m_buffer), "{}", value);
         }
 
-        void write(std::string_view value) { m_buffer.append(value); }
-        void write(bool value) { write(value ? "true" : "false"); }
         void write_indent(int depth);
         void write_escaped(std::string_view text);
 

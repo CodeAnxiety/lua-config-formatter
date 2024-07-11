@@ -165,6 +165,31 @@ std::string formatter::render()
     return {m_buffer.data(), m_buffer.size()};
 }
 
+void formatter::write(std::string_view value)
+{
+    m_buffer.append(value);
+}
+
+void formatter::write(double value)
+{
+    std::string rendered = fmt::format("{:.3f}", value);
+    std::string_view view = rendered;
+
+    // Remove trailing zeros.
+    while (*view.rbegin() == '0')
+        view.remove_suffix(1);
+
+    // Remove trailing decimal point.
+    if (*view.rbegin() == '.')
+        view.remove_suffix(1);
+
+    // Remove leading minus-sign if zero.
+    if (view == "-0")
+        view.remove_prefix(1);
+
+    write(view);
+}
+
 void formatter::write_indent(int depth)
 {
     for (int i = 0; i < depth; i++)
@@ -219,7 +244,9 @@ bool formatter::write_key(double index)
         return false;
     }
 
-    fmt::format_to(m_buffer, "[{}]", index);
+    write("[");
+    write(index);
+    write("]");
     return true;
 }
 
@@ -278,7 +305,7 @@ void formatter::write_table_entry(const sol::object & key,
 
     if (is_indexed()) {
         write(" -- [");
-        write(static_cast<int64_t>(key.as<double>()));
+        write(key.as<double>());
         write("]");
     }
 
