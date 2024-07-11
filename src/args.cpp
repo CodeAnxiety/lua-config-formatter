@@ -1,62 +1,60 @@
 #include "args.h"
 
+#include <algorithm>
 #include <filesystem>
-#include <optional>
+#include <iostream>
 
-#include <lyra/lyra.hpp>
-#include <lyra/help.hpp>
+#include <dimcli/cli.h>
 
 namespace fs = std::filesystem;
 
 static app::arguments s_args;
 const app::arguments & app::args = s_args;
 
-bool app::parse_args(int argc, char ** argv)
+int calculate_verbosity(const std::vector<bool> & verbose)
 {
-    bool show_help = false;
-    std::string exe, input_path, output_path;
-
-    // clang-format off
-    auto cli = lyra::cli()
-        | lyra::help(show_help)
-        | lyra::exe_name(exe)
-        | lyra::opt([&](bool) { s_args.verbosity++; })
-            ["-v"]("Increase verbosity.").cardinality(0, 2)
-        | lyra::opt([&](bool) { s_args.verbosity--; })
-            ["-q"]("Decrease verbosity.").cardinality(0, 2)
-        | lyra::opt(s_args.dry_run)
-            ["--dry-run"]("Skip saving the formatted file(s).")
-        | lyra::opt(s_args.print_output)
-            ["--print-output"]("Print formatted result(s).")
-        | lyra::opt(s_args.validate_output)
-            ["--validate-output"]("Round-trip validation the result.");
-    cli |= lyra::group()
-        | lyra::opt(input_path, "input-path")
-            ["-i", "--input"]("Path to be formatted.").required()
-        | lyra::opt(output_path, "output-path")
-            ["-o", "--output"]("Path to save changes.");
-    cli |= lyra::group()
-        | lyra::arg(input_path, "input-path")("Path to be formatted.")
-            .required()
-        | lyra::arg(output_path, "output-path")("Path to save changes.");
-    // clang-format on
-
-    auto result = cli.parse({argc, argv});
-    if (!result) {
-        std::cerr << result.message() << "\n\n";
-        std::cout << cli;
-        return false;
-    }
-    if (show_help) {
-        std::cout << cli;
-        return false;
+    int verbosity = 0;
+    for (const bool value : verbose) {
+        verbosity += value ? +1 : -1;
     }
 
-    if (output_path.empty())
-        output_path = input_path;
+    return std::clamp(verbosity, -2, 2);
+}
 
-    s_args.exe = exe;
-    s_args.input_path = input_path;
-    s_args.output_path = output_path;
-    return true;
+std::optional<int> app::parse_args(int argc, char ** argv)
+{
+    Dim::Cli cli;
+    cli.title("Lua Config Formatter");
+    auto & verbose =
+        cli.optVec<bool>("v !q verbose. !quiet.").desc("Increase verbosity");
+    auto & dry_run =
+        cli.opt<bool>("n dry-run.").desc("Skip saving the formatted file(s).");
+    auto & print_output =
+        cli.opt<bool>("print-output.").desc("Print formatted result(s).");
+    auto & validate_output = cli.opt<bool>("validate-output.")
+                                 .desc("Round-trip validation the result.");
+    auto & input_path = cli.group("~")
+                            .opt<std::string>("i input <input>")
+                            .desc("Path to be formatted.")
+                            .require();
+    auto & output_path = cli.group("~")
+                             .opt<std::string>("o output [output]")
+                             .desc("Path to save changes.");
+
+    if (!cli.parse(argc, argv)) {
+        return cli.printError(std::cerr);
+    }
+
+    s_args.exe = argv[0];
+    s_args.verbosity = calculate_verbosity(*verbose);
+    s_args.dry_run = *dry_run;
+    s_args.print_output = *print_output;
+    s_args.validate_output = *validate_output;
+    s_args.input_path = *input_path;
+    s_args.output_path = *output_path;
+
+    if (s_args.output_path.empty())
+        s_args.output_path = s_args.input_path;
+
+    return std::nullopt;
 }

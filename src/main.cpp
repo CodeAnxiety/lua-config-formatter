@@ -158,15 +158,15 @@ namespace
 
 int main(int argc, char ** argv)
 {
-    if (!parse_args(argc, argv))
-        return 0;
+    if (const auto result = parse_args(argc, argv))
+        return *result;
 
     info("{} v0.0.1-alpha", args.exe.filename());
     debug("arguments:");
     debug("- verbosity:       {}", args.verbosity);
-    debug("- dry_run:         {}", args.dry_run ? "true" : "false");
-    debug("- print_output:    {}", args.print_output ? "true" : "false");
-    debug("- validate_output: {}", args.validate_output ? "true" : "false");
+    debug("- dry_run:         {}", args.dry_run);
+    debug("- print_output:    {}", args.print_output);
+    debug("- validate_output: {}", args.validate_output);
     debug("- input_path:      {}", args.input_path);
     debug("- output_path:     {}", args.output_path);
 
@@ -182,16 +182,17 @@ int main(int argc, char ** argv)
     }
 
     size_t index = 0;
-    double percent_multipier = 100.0 / files.size();
+    double percent_multiplier = 100.0 / files.size();
     for (const fs::path & path : files) {
-        verbose("[{0:>3.0f}%] {1} of {2}: {3}", ++index * percent_multipier,
+        verbose("[{0:>3.0f}%] {1} of {2}: {3}", ++index * percent_multiplier,
                 index, files.size(), path);
         if (auto formatted = format(path)) {
             if (save_to_output(path, formatted.value()))
                 continue;
         }
-        info("Problems encountered, aborted.");
-        break;
+
+        error("Problems encountered, aborted.");
+        return 2;
     }
 
     info("Done. Formatted {} file(s).", files.size());

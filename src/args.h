@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <optional>
 
 namespace app
 {
@@ -17,5 +18,5 @@ namespace app
 
     extern const arguments & args;
 
-    bool parse_args(int argc, char ** argv);
+    std::optional<int> parse_args(int argc, char ** argv);
 }
