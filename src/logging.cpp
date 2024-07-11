@@ -58,16 +58,25 @@ void app::print(log_level level, std::string_view message, int depth)
     if (!should_print(level))
         return;
 
-    auto* out = (level >= log_level::error) ? (stderr) : (stdout);
+    auto * out = (level >= log_level::error) ? (stderr) : (stdout);
 
     auto style = to_style(level);
 
-    if (depth > 0)
-        fmt::print(out, style, "{:>{}}", "- ", (depth - 1) * 2);
+    for (size_t position = 0; position < message.size();) {
+        if (position == 0) {
+            if (depth > 0)
+                fmt::print(out, style, "{:>{}}", "- ", (depth - 1) * 2);
+            fmt::print(out, style, to_prefix(level));
+        }
 
-    fmt::print(out, style, to_prefix(level));
-    fmt::print(out, style, message);
-    fmt::print(out, "\n");
+        const size_t end_of_line =
+            std::clamp<size_t>(message.find('\n', position), 0, message.size());
+
+        fmt::print(out, style, message.substr(position, end_of_line));
+        fmt::print(out, "\n");
+
+        position = end_of_line + 1;
+    }
 
     if (level >= log_level::fatal) {
         std::fflush(stdout);
