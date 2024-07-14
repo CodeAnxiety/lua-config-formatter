@@ -326,12 +326,6 @@ void formatter::write_table_entry(const sol::object & key,
     if (depth > 0)
         write(",");
 
-    if (is_indexed()) {
-        write(" -- [");
-        write(key.as<double>());
-        write("]");
-    }
-
     write("\n");
 }
 
